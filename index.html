@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة كودجي - الاختبار الأسبوعي: البنية العامة لتطبيقات الويب</title>
+    <style>
+        :root {
+            --bg-color: #0f0e17;
+            --card-bg: #161625;
+            --text-color: #fffffe;
+            --border-color: #2e2f42;
+            --accent-color: #6c5ce7;
+            --accent-glow: #a29bfe;
+            --success-color: #00b894;
+            --danger-color: #ff6b6b;
+            --warning-color: #fdcb6e;
+            --subtext-color: #a7a9be;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+            padding-bottom: 50px;
+            line-height: 1.6;
+        }
+
+        .top-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .timer-box {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(22,22,37,0.9);
+            border: 1px solid var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            z-index: 999;
+            backdrop-filter: blur(5px);
+            display: none;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.2);
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--accent-color);
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            z-index: 999;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.4);
+            transition: transform 0.2s;
+        }
+        .scroll-top:hover { transform: scale(1.1); }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            background: var(--success-color);
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 700;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0,184,148,0.4);
+        }
+        .copy-success.show { display: block; animation: fadeInOut 4s ease forwards; }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(50%, -20px); }
+            15% { opacity: 1; transform: translate(50%, 0); }
+            85% { opacity: 1; transform: translate(50%, 0); }
+            100% { opacity: 0; transform: translate(50%, -20px); }
+        }
+
+        header {
+            background: linear-gradient(180deg, rgba(108,92,231,0.15) 0%, rgba(15,14,23,0) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img, .instructor-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            object-fit: cover;
+            background: var(--card-bg);
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+
+        .brand-text p {
+            color: var(--accent-glow);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge-ib {
+            background: rgba(108,92,231,0.2);
+            color: var(--accent-glow);
+            border: 1px solid var(--accent-color);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 18px;
+            background: transparent;
+            border: none;
+            color: var(--subtext-color);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-nav-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-nav-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(108,92,231,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .info-block {
+            background: rgba(108,92,231,0.1);
+            border-right: 4px solid var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        .info-block.warning {
+            background: rgba(253,203,110,0.1);
+            border-right-color: var(--warning-color);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,92,231,0.4);
+        }
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+        .btn-secondary:hover {
+            background: #3e3f58;
+            box-shadow: none;
+        }
+        .btn-success { background: var(--success-color); }
+        .btn-success:hover { box-shadow: 0 5px 15px rgba(0,184,148,0.4); }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            padding: 16px 30px;
+            width: 100%;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(37,211,102,0.3);
+        }
+        .btn-copy:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+        }
+
+        .whatsapp-hint {
+            background: rgba(37,211,102,0.1);
+            border: 1px solid rgba(37,211,102,0.3);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #25D366;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-item {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.98rem;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(108,92,231,0.05);
+        }
+
+        .option-item.correct {
+            border-color: var(--success-color);
+            background: rgba(0,184,148,0.15);
+            color: #fff;
+        }
+
+        .option-item.wrong {
+            border-color: var(--danger-color);
+            background: rgba(255,107,107,0.15);
+            color: #fff;
+        }
+
+        .option-item input[type="radio"] {
+            accent-color: var(--accent-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        .essay-textarea {
+            width: 100%;
+            min-height: 130px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.8;
+            resize: vertical;
+            margin-bottom: 20px;
+        }
+        .essay-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        .feedback-msg.correct { background: rgba(0,184,148,0.2); color: var(--success-color); }
+        .feedback-msg.wrong { background: rgba(255,107,107,0.2); color: var(--danger-color); }
+
+        .report-details { margin-top: 20px; }
+        .q-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+        .q-num {
+            font-weight: 800;
+            color: var(--accent-glow);
+            margin-bottom: 5px;
+        }
+        .correct-ans { color: var(--success-color); font-weight: 700; }
+        .wrong-ans { color: var(--danger-color); font-weight: 700; }
+        .user-ans { color: var(--warning-color); font-weight: 600; white-space: pre-wrap; }
+
+        .certificate-box {
+            border: 3px dashed var(--accent-color);
+            background: rgba(108,92,231,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .certificate-box h2 {
+            justify-content: center;
+            border: none;
+            color: var(--warning-color);
+            font-size: 1.8rem;
+        }
+        .certificate-box .student-name {
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 800;
+            margin: 15px 0;
+            text-decoration: underline;
+        }
+        .certificate-box .cert-score {
+            font-size: 1.2rem;
+            color: var(--success-color);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .badge-accent {
+            background: var(--accent-color);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        @media (max-width:768px) {
+            .header-content { flex-direction:column; gap:10px; }
+            .brand-text h1 { font-size:1.3rem; }
+            .logo-img, .instructor-img { width:60px; height:60px; }
+            .card { padding:15px; }
+            .timer-box { top:50px; left:10px; padding:5px 12px; font-size:0.75rem; }
+            .tab-nav .tab-nav-btn { min-width:60px; padding:8px 12px; font-size:0.8rem; }
+            .nav-controls .btn { padding:8px 15px; font-size:0.85rem; }
+            .question-text { font-size:1rem; }
+            .btn-copy { font-size:0.95rem; padding:14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="timer-box" id="timer-box">⏱️ <span id="timer-display">90:00</span></div>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<div class="copy-success" id="copy-success">✅ تم نسخ التقرير إلى الحافظة!</div>
+
+<header>
+    <div class="header-content">
+        <div class="logo-section">
+            <img src="logo1.png" alt="لوجو كودجي" class="logo-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🧠%3C/text%3E%3C/svg%3E'">
+            <div class="brand-text">
+                <h1>🧠 منصة كودجي - مهندس: اندرو مجدي</h1>
+                <p>الاختبار الأسبوعي: الدرس الأول - البنية العامة لتطبيقات الويب (الوحدة الثالثة)</p>
+            </div>
+            <img src="logo2.png" alt="المهندس أندرو" class="instructor-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E👨‍🏫%3C/text%3E%3C/svg%3E'">
+        </div>
+        <div class="header-badges">
+            <span class="badge-ib">🌐 الوحدة الثالثة</span>
+            <span class="badge-ib">🖥️ الدرس الأول</span>
+            <span class="badge-ib">🇪🇬 مصر</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="tab-nav" id="main-tabs">
+        <button class="tab-nav-btn active" data-tab="instructions" onclick="switchMainTab('instructions')">📖 تعليمات</button>
+        <button class="tab-nav-btn" data-tab="quiz" onclick="switchMainTab('quiz')">📝 الاختبار الأسبوعي</button>
+        <button class="tab-nav-btn" data-tab="result" onclick="switchMainTab('result')">🏆 النتيجة</button>
+    </div>
+
+    <!-- تبويب التعليمات -->
+    <div class="tab-content active" id="tab-instructions">
+        <section class="card">
+            <h2>📖 تعليمات الاختبار الأسبوعي</h2>
+            <div class="info-block warning">
+                <p style="font-size:1.05rem;line-height:2;">
+                    <strong>📌 مكونات الاختبار:</strong><br>
+                    • <strong>15 سؤال اختيار من متعدد</strong> (من الكتاب المدرسي والتقييمات الرسمية)<br>
+                    • <strong>8 أسئلة مقالية</strong> (تغطي البنية العامة لتطبيقات الويب والطبقات الثلاث)<br><br>
+
+                    <strong>⏱️ مدة الاختبار:</strong> 90 دقيقة<br>
+                    <strong>✅ عدد الأسئلة الكلي:</strong> 23 سؤالاً<br><br>
+
+                    <strong>📝 التعليمات:</strong><br>
+                    1. اقرأ كل سؤال بعناية قبل الإجابة.<br>
+                    2. للاختياري: اختر الإجابة الصحيحة واضغط تحقق.<br>
+                    3. للمقالي: اكتب إجابة منظمة ومفصلة من واقع فهمك للدرس.<br>
+                    4. بعد الانتهاء، اضغط "تأكيد إنهاء الاختبار وإرسال الإجابات".
+                </p>
+            </div>
+            <button class="btn" style="width:100%;padding:14px;margin-top:10px;" onclick="switchMainTab('quiz')">🚀 ابدأ الاختبار الآن</button>
+        </section>
+    </div>
+
+    <!-- تبويب الاختبار -->
+    <div class="tab-content" id="tab-quiz">
+        <section class="card" id="quiz-setup">
+            <h2>📝 الاختبار الأسبوعي - الدرس الأول (البنية العامة لتطبيقات الويب)</h2>
+            <p style="color:var(--subtext-color);">15 سؤال اختيار من متعدد + 8 أسئلة مقالية (الكتاب المدرسي + التقييمات والأداءات).</p>
+            <div style="margin:15px 0;">
+                <label style="display:block;margin-bottom:6px;font-weight:700;">👤 اسمك الثلاثي:</label>
+                <input type="text" id="student-name-input" placeholder="اكتب اسمك هنا..." style="width:100%;padding:12px;background:var(--bg-color);border:1px solid var(--border-color);border-radius:8px;color:#fff;font-size:1rem;">
+            </div>
+            <button class="btn" style="width:100%;padding:14px;" onclick="startQuiz()">🚀 ابدأ الاختبار الآن</button>
+        </section>
+
+        <section class="card" id="quiz-container" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <h2 id="question-title" style="color:#fffffe;">السؤال 1</h2>
+                <span class="badge-accent" id="quiz-progress">1 من 23</span>
+            </div>
+            <div id="dynamic-quiz-area"></div>
+            <div id="feedback-area"></div>
+            <div class="nav-controls">
+                <button class="btn btn-secondary" id="prev-quiz" onclick="navigateQuiz(-1)">السابق</button>
+                <button class="btn" style="background:var(--accent-color);" onclick="checkCurrentAnswer()">🔍 تحقق</button>
+                <button class="btn btn-secondary" id="next-quiz" onclick="navigateQuiz(1)">التالي</button>
+            </div>
+            <button class="btn btn-success" style="width:100%;margin-top:20px;padding:14px;" onclick="submitQuiz()">✔ تأكيد إنهاء الاختبار وإرسال الإجابات</button>
+        </section>
+    </div>
+
+    <!-- تبويب النتيجة -->
+    <div class="tab-content" id="tab-result">
+        <section class="card" id="result-container" style="display:none;">
+            <h2>🎉 نتيجة الاختبار</h2>
+            <p id="score-summary" style="color:var(--subtext-color);font-size:1.1rem;line-height:2;"></p>
+            <div id="report-details-container" class="report-details"></div>
+            <div class="certificate-box" id="certificate">
+                <h2>📜 شهادة إتمام</h2>
+                <p>تشهد منصة كودجي بأن الطالب/الطالبة:</p>
+                <div class="student-name" id="cert-name">—</div>
+                <p>قد أتم بنجاح اختبار <b>الدرس الأول: البنية العامة لتطبيقات الويب (الوحدة الثالثة)</b></p>
+                <p class="cert-score" id="cert-score">🌟 النتيجة: 0%</p>
+                <div style="margin-top:25px;font-size:0.85rem;color:var(--subtext-color);">📅 تم التقييم آلياً بواسطة منصة كودجي 🤖</div>
+            </div>
+
+            <div style="margin-top:25px;">
+                <button class="btn btn-copy" onclick="copyReportToClipboard()">
+                    📋 انسخ التقرير وارسله عبر الواتساب لمهندس أندرو 01285529570
+                </button>
+                <div class="whatsapp-hint">
+                    <span>💡</span>
+                    بعد الضغط على الزر، اذهب إلى واتساب وألصق التقرير (Paste) وأرسله للمهندس أندرو
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+                <button class="btn btn-secondary" onclick="location.reload()">🔄 إعادة الاختبار</button>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // بيانات أسئلة الاختبار الأسبوعي (15 اختياري + 8 مقالي = 23 سؤال)
+    // ============================================================
+    const quizData = [
+        { type: 'mcq', q: "ما المصطلح الذي يُطلق على تطبيق يُستخدم عادةً من خلال متصفح الويب؟", opts: ["برنامج سطح المكتب المحتفظ به محلياً", "تطبيق الويب (Web Application)", "نظام تشغيل الخادم", "برنامج لغة الآلة"], ans: 1 },
+        { type: 'mcq', q: "يُبنى النموذج التعليمي المبسط لتطبيق الويب من:", opts: ["طبقة واحدة تعمل على متصفح العميل", "طبقتين هما العرض والمعالجة فقط", "ثلاث طبقات: واجهة أمامية، واجهة خلفية، وقاعدة بيانات", "أربع طبقات غير متصلة"], ans: 2 },
+        { type: 'mcq', q: "مكوّن الشاشة والواجهة الذي يراه المستخدمون ويتفاعلون معه مباشرة يُسمى:", opts: ["الواجهة الخلفية (Back-end)", "قاعدة البيانات (Database)", "الواجهة الأمامية (Front-end)", "خادم المعالجة المركزية"], ans: 2 },
+        { type: 'mcq', q: "الجزء المسؤول عن المعالجة من جانب الخادم التي لا يراها المستخدمون مباشرة هو:", opts: ["الواجهة الأمامية", "الواجهة الخلفية (Back-end)", "متصفح الويب لدى العميل", "شاشة العرض"], ans: 1 },
+        { type: 'mcq', q: "الطبقة التي تتولى تنظيم البيانات وتخزينها وإدارتها وتوفيرها عند الطلب في تطبيق الويب هي:", opts: ["شاشات البحث", "الواجهة الأمامية", "الواجهة الخلفية", "قاعدة البيانات (Database)"], ans: 3 },
+        { type: 'mcq', q: "في موقع تجارة إلكترونية، معالجة التحقق من المخزون وإرسال طلبات الدفع هي وظيفة تنتمي لـ:", opts: ["الواجهة الأمامية", "قاعدة البيانات", "الواجهة الخلفية (Back-end)", "متصفح المستخدم"], ans: 2 },
+        { type: 'mcq', q: "في موقع تجارة إلكترونية، أي مما يلي تُعد شاشة ينفذها العرض في الواجهة الأمامية؟", opts: ["تخزين سجل الطلبات", "معالجة الدفع والتحكم", "شاشة سلة التسوق وشاشة المنتجات", "تخزين معلومات العملاء"], ans: 2 },
+        { type: 'mcq', q: "في شبكة تواصل الاجتماعي، تُصنّف وظيفة 'تخزين بيانات المنشورات وعلاقات المتابعة' ضمن:", opts: ["الواجهة الأمامية", "الواجهة الخلفية", "طبقة قاعدة البيانات (Database)", "متصفح العميل"], ans: 2 },
+        { type: 'mcq', q: "في شبكة تواصل الاجتماعي، معالجة تحديد الجمهور المستهدف للمنشور والإشعارات تتم في:", opts: ["الواجهة الخلفية (Back-end)", "الواجهة الأمامية", "قاعدة البيانات", "الخط الزمني (Timeline)"], ans: 0 },
+        { type: 'mcq', q: "عند البحث عن منتج في متجر إلكتروني، أي طبقة تُرسل الاستعلام والطلب إلى قاعدة البيانات وتستلم النتائج منها؟", opts: ["الواجهة الأمامية", "الواجهة الخلفية (Back-end)", "قاعدة البيانات نفسها", "المتصفح"], ans: 1 },
+        { type: 'mcq', q: "أي مما يلي يمثل الدور الرئيسي للواجهة الأمامية (Front-end) في تطبيق الويب؟", opts: ["معالجة طلبات الدفع على الخادم", "عرض المحتوى والشاشات واستقبال إدخال المستخدم", "تخزين سجلات الجلسات في الجداول", "التحقق من صحة الحسابات على الخادم"], ans: 1 },
+        { type: 'mcq', q: "أي من التالي يُعتبر مثالاً على البيانات المخزنة في قاعدة بيانات موقع تجارة إلكترونية؟", opts: ["شاشة البحث", "سجل الطلبات وبيانات المنتجات والعملاء", "كود التحقق من تسجيل الدخول", "واجهة تصميم سلة التسوق"], ans: 1 },
+        { type: 'mcq', q: "أي مما يلي يُعتبر مثالاً على تطبيق ويب يُدار عادة عبر متصفح الويب؟", opts: ["برنامج تشغيل فيديو محلي على الجهاز", "موقع خرائط على الإنترنت", "تطبيق حاسبة سطح المكتب", "برنامج تحرير الصور المحلي"], ans: 1 },
+        { type: 'mcq', q: "الفكرة الرئيسة للبنية العامة لتطبيقات الويب هي أن التطبيق يُبنى من:", opts: ["طبقة واحدة تعمل مستقلة على المتصفح", "ثلاث طبقات تتعاون معاً لتحويل إدخالات المستخدم إلى نتائج", "متصفح الويب فقط دون الحاجة لخوادم", "قاعدة بيانات فقط تعتمد على التخزين الذاتي"], ans: 1 },
+        { type: 'mcq', q: "توزيع وتحديد مسؤوليات تطبيق الويب في ثلاث طبقات يساعد في:", opts: ["إلغاء الحاجة لقواعد البيانات", "فصل العرض عن المعالجة والتخزين لسهولة التطوير والصيانة", "جعل التطبيق يعمل بدون إنترنت", "إلغاء دور متصفح الويب"], ans: 1 },
+        { type: 'essay', q: "عرف تطبيق الويب، وعدد الطبقات الرئيسة الثلاث التي يتكون منها النموذج التعليمي المبسط لتطبيقات الويب." },
+        { type: 'essay', q: "وضح الفرق الجوهري بين دور الواجهة الأمامية (Front-end) ودور الواجهة الخلفية (Back-end) في تطبيق الويب مع ذكر مثال لوظيفة كل منهما." },
+        { type: 'essay', q: "اشرح دور طبقة قاعدة البيانات (Database) في تطبيق الويب، وكيف تتعاون مع الواجهة الخلفية لإظهار النتائج للمستخدم." },
+        { type: 'essay', q: "اشرح بالتفصيل كيف تتعاون الطبقات الثلاث (الواجهة الأمامية، الواجهة الخلفية، وقاعدة البيانات) عندما ينشر مستخدم صورة على تطبيق تواصل اجتماعي." },
+        { type: 'essay', q: "تتبع خطوة بخطوة تدفق طلب البحث عن منتج في متجر إلكتروني عبر الطبقات الثلاث بدءاً من كتابة الكلمة وحتى ظهور النتيجة." },
+        { type: 'essay', q: "في خدمة «مشاركة الفيديو عبر الويب»، بين وظيفة ومسؤولية كل طبقة من الطبقات الثلاث في تقديم الخدمة للمستخدم." },
+        { type: 'essay', q: "ناقش أهمية وفائدة تقسيم وتوزيع مسؤوليات تطبيق الويب إلى ثلاث طبقات بدلاً من بنائه في طبقة واحدة." },
+        { type: 'essay', q: "حلل دور الواجهة الخلفية في موقع تجارة إلكترونية موضحاً كيف تتولى معالجة طلبات الدفع وتأكيد الحجز والتحكم في المخزون." }
+    ];
+
+    // ============================================================
+    // متغيرات الحالة
+    // ============================================================
+    let studentName = '';
+    let currentQuizIndex = 0;
+    let studentAnswers = new Array(quizData.length).fill(null);
+    let studentEssayAnswers = new Array(quizData.length).fill('');
+    let quizTimer = null;
+    let timeLeft = 5400;
+
+    function switchMainTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        document.querySelectorAll('.tab-nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-nav-btn[data-tab="${tab}"]`).classList.add('active');
+    }
+
+    function updateProgress() {
+        let total = quizData.length;
+        let done = 0;
+        quizData.forEach((q, idx) => {
+            if (q.type === 'mcq') {
+                if (studentAnswers[idx] !== null) done++;
+            } else {
+                if ((studentEssayAnswers[idx] || '').trim().length >= 5) done++;
+            }
+        });
+        let pct = Math.min(100, (done / total) * 100);
+        document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    function startQuiz() {
+        const nameInput = document.getElementById('student-name-input');
+        if (!nameInput.value.trim()) {
+            alert('⚠️ برجاء إدخال اسمك الثلاثي');
+            return;
+        }
+        studentName = nameInput.value.trim();
+        document.getElementById('quiz-setup').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        document.getElementById('timer-box').style.display = 'block';
+
+        if (quizTimer) clearInterval(quizTimer);
+        timeLeft = 5400;
+        quizTimer = setInterval(function() {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            document.getElementById('timer-display').textContent =
+                (mins < 10 ? '0' + mins : mins) + ':' + (secs < 10 ? '0' + secs : secs);
+            if (timeLeft <= 0) {
+                clearInterval(quizTimer);
+                alert('⏰ انتهى الوقت! سيتم إنهاء الاختبار وإرسال الإجابات.');
+                submitQuiz();
+            }
+        }, 1000);
+
+        loadQuizQuestion(0);
+    }
+
+    function loadQuizQuestion(index) {
+        currentQuizIndex = index;
+        const q = quizData[index];
+        if (!q) return;
+
+        document.getElementById('question-title').textContent = `السؤال ${index + 1} (${q.type === 'mcq' ? 'اختيار من متعدد' : 'مقالي'})`;
+        document.getElementById('quiz-progress').textContent = `${index + 1} من ${quizData.length}`;
+
+        const area = document.getElementById('dynamic-quiz-area');
+        let html = `<div class="question-text">${q.q}</div>`;
+
+        if (q.type === 'mcq') {
+            html += `<ul class="options-list">`;
+            q.opts.forEach((opt, oi) => {
+                const checked = studentAnswers[index] === oi ? 'checked' : '';
+                html += `
+                    <li class="option-item" onclick="selectOption(${index}, ${oi})" id="opt-${index}-${oi}">
+                        <input type="radio" name="quiz-${index}" id="radio-${index}-${oi}" value="${oi}" ${checked}>
+                        <label for="radio-${index}-${oi}" style="cursor:pointer;width:100%;display:block;">${opt}</label>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+        } else {
+            const currentVal = studentEssayAnswers[index] || '';
+            html += `<textarea class="essay-textarea" id="essay-${index}" placeholder="اكتب إجابتك المقالية المفصلة هنا..." oninput="updateEssayAnswer(${index}, this.value)">${currentVal}</textarea>`;
+            html += `<div style="font-size:0.85rem;color:var(--subtext-color);">✍️ اكتب إجابة مفصلة ومنظمة من واقع فهمك للدرس.</div>`;
+        }
+
+        area.innerHTML = html;
+        document.getElementById('feedback-area').innerHTML = '';
+        document.getElementById('prev-quiz').disabled = (index === 0);
+        document.getElementById('next-quiz').disabled = (index === quizData.length - 1);
+        updateProgress();
+    }
+
+    function selectOption(qIndex, optIdx) {
+        studentAnswers[qIndex] = optIdx;
+        const radio = document.getElementById(`radio-${qIndex}-${optIdx}`);
+        if (radio) radio.checked = true;
+        document.querySelectorAll(`#dynamic-quiz-area .option-item`).forEach(item => {
+            item.classList.remove('correct', 'wrong');
+        });
+        document.getElementById('feedback-area').innerHTML = '';
+        updateProgress();
+    }
+
+    function updateEssayAnswer(index, value) {
+        studentEssayAnswers[index] = value;
+        updateProgress();
+    }
+
+    function checkCurrentAnswer() {
+        const q = quizData[currentQuizIndex];
+        const fb = document.getElementById('feedback-area');
+
+        if (q.type === 'mcq') {
+            const selected = studentAnswers[currentQuizIndex];
+            if (selected === null || selected === undefined) {
+                fb.innerHTML = '<div class="feedback-msg wrong">⚠️ لم تختر إجابة بعد.</div>';
+                return;
+            }
+            const correct = (q.ans === selected);
+            document.querySelectorAll('#dynamic-quiz-area .option-item').forEach((item, idx) => {
+                item.classList.remove('correct', 'wrong');
+                if (idx === q.ans) item.classList.add('correct');
+                else if (idx === selected && !correct) item.classList.add('wrong');
+            });
+            if (correct) {
+                fb.innerHTML = '<div class="feedback-msg correct">🎉 إجابة صحيحة! أحسنت.</div>';
+            } else {
+                fb.innerHTML = '<div class="feedback-msg wrong">❌ إجابة خاطئة. الإجابة الصحيحة هي: ' + q.opts[q.ans] + '</div>';
+            }
+        } else {
+            const essayVal = studentEssayAnswers[currentQuizIndex] || '';
+            if (essayVal.trim().length < 5) {
+                fb.innerHTML = '<div class="feedback-msg wrong">⚠️ يرجى كتابة إجابة أطول (على الأقل 5 أحرف).</div>';
+            } else {
+                fb.innerHTML = '<div class="feedback-msg correct">✅ تم حفظ إجابتك المقالية بنجاح.</div>';
+            }
+        }
+    }
+
+    function navigateQuiz(delta) {
+        const essayArea = document.getElementById('essay-' + currentQuizIndex);
+        if (essayArea) {
+            studentEssayAnswers[currentQuizIndex] = essayArea.value;
+        }
+        const newIdx = currentQuizIndex + delta;
+        if (newIdx >= 0 && newIdx < quizData.length) {
+            loadQuizQuestion(newIdx);
+        }
+    }
+
+    function submitQuiz() {
+        const essayArea = document.getElementById('essay-' + currentQuizIndex);
+        if (essayArea) {
+            studentEssayAnswers[currentQuizIndex] = essayArea.value;
+        }
+
+        let unanswered = 0;
+        let mcqCorrect = 0;
+        let mcqTotal = 0;
+        let essayAnswered = 0;
+        let essayTotal = 0;
+
+        quizData.forEach((q, idx) => {
+            if (q.type === 'mcq') {
+                mcqTotal++;
+                if (studentAnswers[idx] === q.ans) mcqCorrect++;
+                else if (studentAnswers[idx] === null) unanswered++;
+            } else {
+                essayTotal++;
+                let ans = studentEssayAnswers[idx] || '';
+                if (ans.trim().length >= 5) essayAnswered++;
+                else unanswered++;
+            }
+        });
+
+        if (unanswered > 0) {
+            if (!confirm(`⚠️ لديك ${unanswered} سؤالاً لم تجب عليه. هل تريد الإرسال على أي حال؟`)) {
+                return;
+            }
+        }
+
+        clearInterval(quizTimer);
+        document.getElementById('timer-box').style.display = 'none';
+
+        const mcqPercent = mcqTotal > 0 ? Math.round((mcqCorrect / mcqTotal) * 100) : 0;
+        const essayPercent = essayTotal > 0 ? Math.round((essayAnswered / essayTotal) * 100) : 0;
+        const overall = Math.round((mcqPercent + essayPercent) / 2);
+
+        let reportHTML = '<h3 style="color:#fff;">📋 التقرير الشامل للإجابات</h3>';
+        quizData.forEach((q, idx) => {
+            let num = idx + 1;
+            reportHTML += '<div class="q-item">';
+            reportHTML += '<div class="q-num">السؤال ' + num + ' (' + (q.type === 'mcq' ? 'اختياري' : 'مقالي') + '):</div>';
+            reportHTML += '<div>' + q.q + '</div>';
+            if (q.type === 'mcq') {
+                let userAns = studentAnswers[idx];
+                let isCorrect = (userAns === q.ans);
+                let correctText = q.opts[q.ans];
+                let userText = (userAns !== null && userAns !== undefined) ? q.opts[userAns] : 'لم يتم الإجابة';
+                let cls = isCorrect ? 'correct-ans' : 'wrong-ans';
+                let icon = isCorrect ? '✅' : '❌';
+                reportHTML += '<div>📌 الإجابة الصحيحة: <span class="correct-ans">' + correctText + '</span></div>';
+                reportHTML += '<div>👤 إجابة الطالب: <span class="' + cls + '">' + userText + '</span> ' + icon + '</div>';
+            } else {
+                let userText = studentEssayAnswers[idx] || 'لم يتم الإجابة';
+                reportHTML += '<div>👤 إجابة الطالب: <span class="user-ans">' + userText + '</span></div>';
+            }
+            reportHTML += '</div>';
+        });
+
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('result-container').style.display = 'block';
+        document.getElementById('score-summary').innerHTML =
+            '📊 <b style="color:#fff;">النتيجة النهائية:</b> ' + overall + '%<br>' +
+            '📝 اختيار من متعدد: ' + mcqCorrect + '/' + mcqTotal + ' (' + mcqPercent + '%)<br>' +
+            '✍️ مقالي: ' + essayAnswered + '/' + essayTotal + ' (' + essayPercent + '%)';
+
+        document.getElementById('report-details-container').innerHTML = reportHTML;
+        document.getElementById('cert-name').textContent = studentName || 'طالب منصة كودجي';
+        document.getElementById('cert-score').textContent = '🌟 النتيجة: ' + overall + '%';
+
+        switchMainTab('result');
+        updateProgress();
+    }
+
+    function copyReportToClipboard() {
+        let reportLines = [];
+        reportLines.push('مرحباً مهندس أندرو 👋');
+        reportLines.push('');
+        reportLines.push('الطالب/الطالبة: ' + (studentName || 'طالب منصة كودجي'));
+        reportLines.push('الدرس: الأول (الوحدة الثالثة) - البنية العامة لتطبيقات الويب');
+        reportLines.push(document.getElementById('cert-score').textContent || '🌟 النتيجة: 100%');
+        reportLines.push('');
+        reportLines.push('📋 التقرير الشامل - الاختبار الأسبوعي للدرس الأول:');
+        reportLines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+        quizData.forEach((q, idx) => {
+            let num = idx + 1;
+            let line = 'س' + num + ': ' + q.q;
+            if (q.type === 'mcq') {
+                let userAns = studentAnswers[idx];
+                let isCorrect = (userAns === q.ans);
+                let correctText = q.opts[q.ans];
+                let userText = (userAns !== null && userAns !== undefined) ? q.opts[userAns] : 'لم يجب';
+                let icon = isCorrect ? '✅' : '❌';
+                line += ' | صح: ' + correctText + ' | إجابتي: ' + userText + ' ' + icon;
+            } else {
+                let userText = studentEssayAnswers[idx] || 'لم يجب';
+                line += ' | إجابتي: ' + userText;
+            }
+            reportLines.push(line);
+        });
+
+        reportLines.push('');
+        reportLines.push('تم التقييم بواسطة منصة كودجي 🤖');
+
+        let fullReport = reportLines.join('\n');
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullReport).then(function() {
+                showCopySuccess();
+            }).catch(function() {
+                fallbackCopy(fullReport);
+            });
+        } else {
+            fallbackCopy(fullReport);
+        }
+    }
+
+    function fallbackCopy(text) {
+        let textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showCopySuccess();
+        } catch (err) {
+            alert('❌ حدث خطأ أثناء النسخ. برجاء نسخ التقرير يدوياً.');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    function showCopySuccess() {
+        let el = document.getElementById('copy-success');
+        el.classList.add('show');
+        setTimeout(function() {
+            el.classList.remove('show');
+        }, 4000);
+    }
+
+    window.addEventListener('scroll', function() {
+        let btn = document.getElementById('scroll-top');
+        if (btn) {
+            if (window.scrollY > 400) btn.style.display = 'block';
+            else btn.style.display = 'none';
+        }
+    });
+
+    window.addEventListener('DOMContentLoaded', function() {
+        switchMainTab('instructions');
+    });
+
+    window.switchMainTab = switchMainTab;
+    window.startQuiz = startQuiz;
+    window.selectOption = selectOption;
+    window.checkCurrentAnswer = checkCurrentAnswer;
+    window.submitQuiz = submitQuiz;
+    window.copyReportToClipboard = copyReportToClipboard;
+    window.navigateQuiz = navigateQuiz;
+    window.loadQuizQuestion = loadQuizQuestion;
+    window.updateEssayAnswer = updateEssayAnswer;
+</script>
+
+</body>
+</html>
